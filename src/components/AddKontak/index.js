@@ -10,15 +10,14 @@ import {
 // export const useMountEffect = (fun) => useEffect(fun, []);
 
 function AddContact() {
-  const {
-    getListKontakResult,
-    addKontakResult,
-    updateKontakResult,
-    detailKontakResult,
-  } = useSelector((state) => state.KontakReducer);
-  const [nama, setNama] = useState("");
-  const [nohp, setNohp] = useState("");
-  const [id, setId] = useState("");
+  const { getListKontakResult, addKontakResult, updateKontakResult } =
+    useSelector((state) => state.KontakReducer);
+  const [database, setDatabase] = useState({
+    nama: "",
+    nohp: "",
+    id: "",
+  });
+  console.log({ database });
   const [index, setIndex] = useState(0);
 
   //!autofocus-------------------------------------------------
@@ -57,9 +56,11 @@ function AddContact() {
   };
   const seleArray = (ci) => {
     if (getListKontakResult.length) {
-      setNama(getListKontakResult[ci].nama);
-      setNohp(getListKontakResult[ci].nohp);
-      setId(getListKontakResult[ci].id);
+      setDatabase({
+        nama: getListKontakResult[ci].nama,
+        nohp: getListKontakResult[ci].nohp,
+        id: getListKontakResult[ci].id,
+      });
       // setLogicCmd((prevState) => ({ ...prevState, mhlcmd: true }));
       setLogicCmd({
         mhlcmd: true,
@@ -73,11 +74,17 @@ function AddContact() {
   // console.log(id);
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (id) {
+    if (database.id) {
       //uodate kontak
-      dispatch(updateKontak({ id: id, nama: nama, nohp: nohp }));
+      dispatch(
+        updateKontak({
+          id: database.id,
+          nama: database.nama,
+          nohp: database.nohp,
+        })
+      );
     } else {
-      dispatch(addKontak({ nama: nama, nohp: nohp }));
+      dispatch(addKontak({ nama: database.nama, nohp: database.nohp }));
     }
   };
   const clickTop = () => {
@@ -110,7 +117,7 @@ function AddContact() {
     }
   };
   const setDelete = () => {
-    dispatch(deleteKontak(id));
+    dispatch(deleteKontak(database.id));
     setLogicCmd((prevState) => ({
       ...prevState,
       mhlcmd: false,
@@ -141,9 +148,7 @@ function AddContact() {
         mhldelete: false,
         mhlkosong: true,
       });
-      setNama("");
-      setNohp("");
-      setId("");
+      setDatabase({ nama: "", nohp: "", id: "" });
     }
     setMhlreset(false);
     setFormState((prevState) => ({
@@ -197,42 +202,34 @@ function AddContact() {
       return;
     }
   }, [logicCmd]);
-  // useEffect(() => {
-  //   if (detailKontakResult.length) {
-  //     setNama(detailKontakResult.nama);
-  //     setNohp(detailKontakResult.nohp);
-  //     setId(detailKontakResult.id);
-  //   }
-  // }, [detailKontakResult]);
-
   useEffect(() => {
     if (addKontakResult) {
       // dispatch(getListKontak());
-      setNama("");
-      setNohp("");
-      setId("");
+      setDatabase({ nama: "", nohp: "", id: "" });
       focusInput();
     }
   }, [addKontakResult]);
   useEffect(() => {
     if (updateKontakResult) {
       dispatch(getListKontak());
-      // setNama("");
-      // setNohp("");
-      // setId("");
     }
   }, [updateKontakResult, dispatch]);
   return (
     <div>
-      <h4>{id ? "Edit Kontak" : "Add Kontak"}</h4>
+      <h4>Kontak</h4>
       <form onSubmit={(event) => handleSubmit(event)}>
         <input
           type="text"
           name="nama"
           placeholder="Nama . . . "
           autoComplete="off"
-          value={nama}
-          onChange={(event) => setNama(event.target.value)}
+          value={database.nama}
+          onChange={(event) =>
+            setDatabase((prevState) => ({
+              ...prevState,
+              nama: event.target.value,
+            }))
+          }
           disabled={formState.txtmhcctnm}
           ref={txtmhcctnm}
         />
@@ -241,8 +238,13 @@ function AddContact() {
           name="nohp"
           placeholder="No.Hp . . . "
           autoComplete="off"
-          value={nohp}
-          onChange={(event) => setNohp(event.target.value)}
+          value={database.nohp}
+          onChange={(event) =>
+            setDatabase((prevState) => ({
+              ...prevState,
+              nohp: event.target.value,
+            }))
+          }
           disabled={formState.txtmhcnohp}
           // ref={txtmhcnohp}
         />
@@ -290,9 +292,7 @@ function AddContact() {
             mhldelete: false,
             mhlkosong: false,
           }));
-          setNama("");
-          setNohp("");
-          setId("");
+          setDatabase({ nama: "", nohp: "", id: "" });
         }}
         disabled={buttonState.add}
       >

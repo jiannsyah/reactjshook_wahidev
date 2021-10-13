@@ -54,6 +54,7 @@ export const getListKontak = () => {
 };
 
 export const addKontak = (data) => {
+  // console.log(data);
   return (dispatch) => {
     //loading
     dispatch({
